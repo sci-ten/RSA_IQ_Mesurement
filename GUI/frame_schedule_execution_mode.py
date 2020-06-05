@@ -6,11 +6,14 @@ Created on 2020/06/02
 import tkinter as tk
 from tkinter import filedialog
 
+#Local Library
+from Scheduller import mesurement_schedule
+from File_Checker import format_check
 
 class FrameScheduleExecutionMode(tk.Frame):
     def __init__(self,master=None):
         """
-        master : object <class 'tkinter.Tk'>
+        master: object <class 'tkinter.Tk'>
 
         nextpage: object <class 'tkinter.Tk'>
             Transition destination page
@@ -51,26 +54,26 @@ class FrameScheduleInputForm(tk.Frame):
         self.frame.pack()
         self.sche_input_form = tk.Frame(self.frame, relief=tk.RIDGE, bd=2)
 
-        l1 = tk.Label(self.sche_input_form, text='Schedule Input Form',  bd=2)
-        l1.grid(row=0, column=0, columnspan=1, padx=5, pady=5)
+        l1 = tk.Label(self.sche_input_form, text='Mesurement schedule file path',  bd=2)
+        l1.grid(row=0, column=0, columnspan=1, padx=15, pady=8)
         self.schepath_entry=tk.Entry(self.sche_input_form)
         self.schepath_entry.insert(tk.END,"\C:")
-        self.schepath_entry.grid(row=1, column=0, columnspan=1, padx=5, pady=5)
+        self.schepath_entry.grid(row=1, column=0, columnspan=1, padx=15, pady=8)
         #Open file explore
         sbutton=tk.Button(self.sche_input_form,text='...', command=self.sbutton_clicked)
-        sbutton.grid(row=1, column=1, columnspan=1, padx=5, pady=5)
+        sbutton.grid(row=1, column=1, columnspan=1, padx=15, pady=8)
         self.sche_input_form.grid(row=0, column=0)
 
     def sbutton_clicked(self):
         sp = tk.Tk()
         sp.withdraw()
-        sp.filename =  filedialog.askdirectory(initialdir = "/",title = "Select Directory")
+        sp.filename =  filedialog.askopenfilename(initialdir = "/",title = "Select Directory")
         print (sp.filename)
         #self.savepath=sp.filename
         self.schepath_entry.delete(0, tk.END)
         self.schepath_entry.insert(tk.END,sp.filename)
 
-class FrameScheduleSavePathForm(tk.Frame):
+class FrameScheduleSaveForm(tk.Frame):
     def __init__(self,master=None):
         """
         master : object <class 'tkinter.Tk'>
@@ -88,32 +91,68 @@ class FrameScheduleSavePathForm(tk.Frame):
     def create_widget(self):
         self.frame = tk.Frame(self.master)
         self.frame.pack()
+
         self.save_path_frame = tk.Frame(self.frame, relief=tk.RIDGE, bd=2)
         l1 = tk.Label(self.save_path_frame, text='TIQ save Directory',  bd=2)
-        l1.grid(row=0, column=0, columnspan=1, padx=5, pady=5)
+        l1.grid(row=0, column=0, columnspan=1, padx=15, pady=8)
         self.savedir_entry=tk.Entry(self.save_path_frame)
         self.savedir_entry.insert(tk.END,"\C:")
-        self.savedir_entry.grid(row=1, column=0, columnspan=1, padx=5, pady=5)
-        #Open file explore
-        sbutton=tk.Button(self.save_path_frame,text='...', command=self.sbutton_clicked)
-        sbutton.grid(row=1, column=1, columnspan=1, padx=5, pady=5)
-        self.save_path_frame.pack(padx=5, pady=5)
+        self.savedir_entry.grid(row=1, column=0, columnspan=1, padx=15, pady=8)
 
-    def sbutton_clicked(self):
+        self.prog_path_frame = tk.Frame(self.frame, relief=tk.RIDGE, bd=2)
+        l2 = tk.Label(self.prog_path_frame, text='Mesurement Progress save Directory',bd=2)
+        l2.grid(row=0, column=0, columnspan=1, padx=15, pady=8)
+        self.progdir_entry=tk.Entry(self.prog_path_frame)
+        self.progdir_entry.insert(tk.END,"\C:")
+        self.progdir_entry.grid(row=1, column=0, columnspan=1, padx=15, pady=8)
+
+        #Open file explore
+        sbutton1=tk.Button(self.save_path_frame,text='...', command=self.sbutton_clicked1)
+        sbutton1.grid(row=1, column=1, columnspan=1, padx=15, pady=8)
+        self.save_path_frame.pack(padx=5, pady=5)
+        sbutton2=tk.Button(self.prog_path_frame,text='...', command=self.sbutton_clicked2)
+        sbutton2.grid(row=1, column=1, columnspan=1, padx=15, pady=8)
+        self.prog_path_frame.pack(padx=5, pady=5)
+
+    def sbutton_clicked1(self):
         sp = tk.Tk()
         sp.withdraw()
         sp.filename =  filedialog.askdirectory(initialdir = "/",title = "Select Directory")
         print (sp.filename)
-        self.savepath=sp.filename
+        #self.savepath=sp.filename
         self.savedir_entry.delete(0, tk.END)
         self.savedir_entry.insert(tk.END,sp.filename)
 
+    def sbutton_clicked2(self):
+        sp = tk.Tk()
+        sp.withdraw()
+        sp.filename =  filedialog.askdirectory(initialdir = "/",title = "Select Directory")
+        print (sp.filename)
+        #self.savepath=sp.filename
+        self.progdir_entry.delete(0, tk.END)
+        self.progdir_entry.insert(tk.END,sp.filename)
+
+
+class FrameNowState(tk.Frame):
+    def __init__(self,master=None):
+        super().__init__(master)
+        self.pack()
+        self.create_widget()
+        self.pack()
+
+    def create_widget(self):
+        self.frame = tk.Frame(self.master)
+        self.frame.pack()
+        self.mode_var=tk.StringVar()
+        self.mode_var.set("Now State: Waiting for Input")
+        self.label1=tk.Label(self.frame,textvariable=self.mode_var,font=("",18))
+        self.label1.pack(padx=5, pady=10)
 
 
 
 #Mesurement execution button
 class RunBotton(tk.Frame):
-    def __init__(self,master=None,schepath_entry=None,savedir_entry=None,mang_rsa=None,App=None):
+    def __init__(self,master=None,schepath_entry=None,savedir_entry=None,progdir_entry=None,App=None,frame_nowState=None):
         """
         master : object <class 'tkinter.Tk'>
 
@@ -125,15 +164,21 @@ class RunBotton(tk.Frame):
 
         mange_rsa: object <class 'Control_RSA'>
             object to controll RSA
+
+        App: object <class 'tkinter.Tk'>
+            top level GUI application
+
+        frame_nowState <class 'tkinter.Tk'>
+            tkinter frame which has label to display the current app status
         """
         super().__init__(master)
         self.create_widget()
         self.schepath_entry=schepath_entry
         self.savedir_entry=savedir_entry
+        self.progdir_entry=progdir_entry
 
-        self.mang_rsa=mang_rsa
-        self.conf=mang_rsa.par
         self.App=App
+        self.frame_nowState=frame_nowState
 
         self.pack()
 
@@ -142,6 +187,36 @@ class RunBotton(tk.Frame):
         rbutton.pack(padx=5, pady=5)
 
     def run_button_clicked(self):
-        print("Run Sche")
+        print("--Run Schedule Mode--")
         print(self.schepath_entry.get())
         print(self.savedir_entry.get())
+        #Get value from input form to set mesurement parameter
+        schepath=self.schepath_entry.get()
+        savedir=self.savedir_entry.get()
+        progdir=self.progdir_entry.get()
+        #check file are exsist and file extension is correct
+        file_check=format_check.check_paths_or_dirs_exsist([schepath,schepath,progdir])
+        extension=format_check.check_file_extention(schepath,extention='csv')
+        if file_check and  extension==False:
+            self.failure_window()
+            return 0
+
+        #Change App status
+        self.frame_nowState.mode_var.set("Now State: Waiting for Mesurement Start Time")
+
+        #Exsecute Mesuement program according to schedule
+        sche=mesurement_schedule.SchedulemManager(schepath,savedir,self.App)
+        sche.controll_mesurement()
+        #Finished
+        self.App.destroy()
+
+    def failure_window(self):
+        failwin=tk.Tk()
+        failwin.geometry('150x100+100+300')
+        label1 = tk.Label(
+            failwin,
+            text='Please try again setting',
+            width=30,
+            )
+
+        label1.pack()

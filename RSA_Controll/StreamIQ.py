@@ -18,19 +18,16 @@ import tkinter as tk
 import pandas as pd
 
 
-import csv
-
-from RSA_API import *
-from time_adjust import *
 
 
-
+from RSA_Controll.RSA_API import *
+from RSA_Controll.time_adjust import *
+from RSA_Controll.Mesurement_log import *
 
 
 
 # C:\Tektronix\RSA_API\lib\x64 needs to be added to the
 # PATH system environment variable
-"""################CLASSES AND FUNCTIONS################"""
 
 class Control_RSA:
     """
@@ -94,9 +91,11 @@ class Control_RSA:
         #save measuremant parameter
         self.par.export_parameter_csv_with_time()
 
+        #Time adjustment
         timer=TimeAdjust()
+        if timer.standerd_time is None:
+            timer=TimeAdjustOffline()
         timer.set_standerd_time()
-        print("standerdtime",timer.standerd_time)
 
         ##Run RSA device
         self.rsa.DEVICE_Run()
@@ -124,15 +123,11 @@ class Control_RSA:
             #Start IQstreaming
             self.rsa.IQSTREAM_Start()
 
-
-            nowUnixTime=timer.get_now_time_stamp()
-            time_file=os.path.join(self.par.savedir,"file_make_time.csv")
-            tiqname=str(fileName)
-
             #add mesuremnt log
-            self.add_mesuremnt_log(time_file,nowUnixTime,tiqname)
-
-
+            prog=MesurementProgress(self.par.savedir)
+            nowUnixTime=timer.get_now_time_stamp()
+            tiqname=str(fileName)
+            prog.add_mesuremnt_log(nowUnixTime,tiqname)
 
             #Case of complete.value==False,->continuous mesurement.
             while not complete.value:
@@ -238,16 +233,6 @@ class Control_RSA:
         """
         if ReturnStatus(rs) != ReturnStatus.noError:
             raise RSAError(ReturnStatus(rs).name)
-
-    @staticmethod
-    def add_mesuremnt_log(filepath,nowUnixTime,tiqname):
-
-        #time_str=convert_string_timestamp(nowUnixTime)
-
-        with open(filepath,'a', newline="") as f:
-            writer=csv.writer(f)
-            writer.writerow([nowUnixTime,tiqname])
-
 
 
 class Config_parameter:
@@ -428,6 +413,8 @@ class Config_parameter:
         df.to_csv(os.path.join(self.savedir,filename))
 
 
+"""
+
 def main():
     #set the RSA API path
     os.chdir("C:\\Tektronix\\RSA_API\\lib\\x64")
@@ -442,3 +429,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+"""

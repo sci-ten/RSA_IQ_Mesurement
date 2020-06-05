@@ -7,6 +7,8 @@ import tkinter as tk
 from tkinter import filedialog
 import time
 from GUI import initial_parameter
+from Scheduller.Simple_Setting_Mode_Controll import *
+
 
 #Header message
 class FrameSimpleSettingMode(tk.Frame):
@@ -110,7 +112,7 @@ class FrameParameterInput(tk.Frame):
         self.savedir_entry.insert(tk.END,sp.filename)
 
 
-    #ウィンドウから入力データを取得
+    #get mesurement parameter from window
     def get_parameter_from_window(self):
 
         try:
@@ -129,7 +131,7 @@ class FrameParameterInput(tk.Frame):
 
 #Mesurement execution button
 class RunBotton(tk.Frame):
-    def __init__(self,master=None,inputframe=None,mang_rsa=None,App=None):
+    def __init__(self,master=None,inputframe=None,App=None):
         """
         master : object <class 'tkinter.Tk'>
 
@@ -138,15 +140,10 @@ class RunBotton(tk.Frame):
 
         inputframe: object <class 'FrameParameterInput'>
             tkinter frame corresponds to the input form
-
-        mange_rsa: object <class 'Control_RSA'>
-            object to controll RSA
         """
         super().__init__(master)
         self.create_widget()
         self.inputframe=inputframe
-        self.mang_rsa=mang_rsa
-        self.conf=mang_rsa.par
         self.App=App
 
         self.pack()
@@ -164,27 +161,25 @@ class RunBotton(tk.Frame):
             self.failure_window()
             return
 
-        #Set parameter
-        self.conf.set_parameter(cf=parameter['cf'],refLevel=parameter['refLevel'],bw=parameter['bw'],durationMsec=parameter['durationMsec'],waitTime=parameter['waitTime'],fileInterval=parameter['fileInterval'],savedir=parameter['savedir'])
-
-        #Check parameters and update application status
-        self.app_state=self.conf.check_parameter()
+        self.runner=SimpleSettingMode(parameter)
+        #Check parameter is not invalid
+        self.app_state=self.runner.RunCheck()
         if not self.app_state:
             self.failure_window()
+            return
 
         #Saved to use as initial parameter value at the next mesuremnt
         self.inputframe.dic_par=self.inputframe.initpar.make_dic(cf=parameter['cf'],refLevel=parameter['refLevel'],bw=parameter['bw'],durationMsec=parameter['durationMsec'],waitTime=parameter['waitTime'],fileInterval=parameter['fileInterval'])
         self.inputframe.initpar.save_parameter(self.inputframe.dic_par)
 
-        #RUN
-        if self.app_state:
-            self.conf.print_prameter()
+        print("観測開始")
+        time.sleep(0.1)
+        #Break GUI
+        self.App.destroy()
 
-            print("観測開始")
-            time.sleep(0.1)
-            self.App.destroy()
-            #IQ STreamingを開始
-            self.mang_rsa.iq_stream()
+        #Run IQ Streaming
+        self.runner.Run()
+
 
 
     def failure_window(self):
