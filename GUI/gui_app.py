@@ -10,17 +10,11 @@ from GUI import menubar
 from GUI import frame_simple_setting_mode
 from GUI import frame_schedule_execution_mode
 
-sys.path.append("C:\pleiades\workspace\RSA_IQ_Mesurement\RSA_Controll")
-import StreamIQ
-import StreamIQ_ScheduleMesurement
-
-
-
 class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.master.geometry("500x420")
-        self.master.title("ウィンドウのタイトル")
+        self.master.title("Mesurement Setting")
         self.create_widget()
 
     def create_widget(self):
@@ -66,5 +60,6 @@ class Application(tk.Frame):
         page_list=[self.page1,self.page2]
 
         #add menu bar
-        self.master['menu']=menubar.Menubar(pagelist=page_list)
+        self.menubar_obj=menubar.Menubar(pagelist=page_list)
+        self.master['menu']=self.menubar_obj
 

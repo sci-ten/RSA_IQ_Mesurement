@@ -33,22 +33,17 @@ class SimpleSettingMode():
 
         self.mang_rsa=Control_RSA(rsa=rsa)
         self.conf=self.mang_rsa.par
+        self.app_state=False
 
         #Set parameter
-        self.conf.set_parameter(cf=parameter['cf'],refLevel=parameter['refLevel'],bw=parameter['bw'],durationMsec=parameter['durationMsec'],waitTime=parameter['waitTime'],fileInterval=parameter['fileInterval'],savedir=parameter['savedir'])
+        self.conf.set_parameter(cf=parameter['cf'],refLevel=parameter['refLevel'],bw=parameter['bw'],durationMsec=parameter['durationMsec'],fileInterval=parameter['fileInterval'],savedir=parameter['savedir'])
 
     def Run(self):
-        #RUN
-        if self.app_state:
+        if self.app_state==True:
             self.conf.print_prameter()
             #Start IQ Streaming
             self.mang_rsa.iq_stream()
-        else:
-            print("Please try again setting")
-            return
 
     def RunCheck(self):
         self.app_state=self.conf.check_parameter()
-        if not self.app_state:
-            return False
-        return True
+        return self.app_state

@@ -7,8 +7,9 @@ import tkinter as tk
 from tkinter import filedialog
 
 #Local Library
-from Scheduller import mesurement_schedule
 from File_Checker import format_check
+from Scheduller import main_controll
+
 
 class FrameScheduleExecutionMode(tk.Frame):
     def __init__(self,master=None):
@@ -156,14 +157,14 @@ class RunBotton(tk.Frame):
         """
         master : object <class 'tkinter.Tk'>
 
-        nextpage: object <class 'tkinter.Tk'>
-            Transition destination page
+        schepath : object <class 'tkinter.Tk'>
+            tkinter entry to input directory of loding csv discribed mesurement schedule
 
-        inputframe: object <class 'FrameParameterInput'>
-            tkinter frame corresponds to the input form
+        savedir: object <class 'tkinter.Tk'>
+            tkinter entry to input directory of saving TIQ file
 
-        mange_rsa: object <class 'Control_RSA'>
-            object to controll RSA
+        progdir: object <class 'tkinter.Tk'>
+            tkinter entry to input directory of saving mesurement progress
 
         App: object <class 'tkinter.Tk'>
             top level GUI application
@@ -204,9 +205,10 @@ class RunBotton(tk.Frame):
         #Change App status
         self.frame_nowState.mode_var.set("Now State: Waiting for Mesurement Start Time")
 
-        #Exsecute Mesuement program according to schedule
-        sche=mesurement_schedule.SchedulemManager(schepath,savedir,self.App)
-        sche.controll_mesurement()
+        parameter={"schepath":schepath,"savedir":savedir,"progdir":progdir}
+        self.runner=main_controll.MesurementMainControll(mode='A',App=self.App,parameter=parameter)
+        self.runner.run()
+
         #Finished
         self.App.destroy()
 

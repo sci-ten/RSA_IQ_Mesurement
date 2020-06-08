@@ -131,14 +131,13 @@ class Control_RSA:
 
             #Case of complete.value==False,->continuous mesurement.
             while not complete.value:
-                #wait fixed time which is set first.
-                time.sleep(self.par.waitTime)
                 #Monitor streaming progress.If time passes more than durationMsec,then complete=True.
                 self.rsa.IQSTREAM_GetDiskFileWriteStatus(byref(complete), byref(writing))
             #Stop IQstreaming
             self.rsa.IQSTREAM_Stop()
             time.sleep(self.par.fileInterval)
             num += 1
+
 
 
     @staticmethod
@@ -257,10 +256,6 @@ class Config_parameter:
         Continuous observation time (cycle) Time to stream to one file
         [usec]
 
-    waitTime: float
-        Cycle to confirm the end of streaming of one file
-        [sec]
-
     fileInterval: float
         File make interval.Make each tiq files after wating for the value.
         [sec]
@@ -286,8 +281,6 @@ class Config_parameter:
         self.bw=0.0
         #Continuous observation time (cycle) Time to stream to one file [usec]
         self.durationMsec=0
-        #Cycle to confirm the end of streaming of one file
-        self.waitTime=0
         #File make interval.Make each tiq files after wating for the value[sec]
         self.fileInterval=0.0
         #samping rate (private variable)
@@ -298,7 +291,7 @@ class Config_parameter:
         self.dest=None
 
 
-    def set_parameter(self,cf,refLevel,bw,durationMsec,waitTime,fileInterval,savedir):
+    def set_parameter(self,cf,refLevel,bw,durationMsec,fileInterval,savedir):
         """
         set measurement parameter
 
@@ -320,10 +313,6 @@ class Config_parameter:
             Continuous observation time (cycle) Time to stream to one file
             [usec]
 
-        waitTime: float
-            Cycle to confirm the end of streaming of one file
-            [sec]
-
         fileInterval: float
             File make interval.Make each tiq files after wating for the value
             [sec]
@@ -335,7 +324,6 @@ class Config_parameter:
         self.refLevel=refLevel
         self.bw=bw
         self.durationMsec=durationMsec
-        self.waitTime=waitTime
         self.fileInterval=fileInterval
         self.savedir=savedir
 
@@ -349,7 +337,6 @@ class Config_parameter:
             self.refLevel=float(self.refLevel)
             self.bw=float(self.bw)
             self.durationMsec=int(self.durationMsec)
-            self.waitTime=float(self.waitTime)
             self.fileInterval=float(self.fileInterval)
 
         except:
@@ -393,7 +380,6 @@ class Config_parameter:
         print("Reference Level[dBm]",self.refLevel)
         print("Band Width[Hz]",self.bw)
         print("Duration[msec]",self.durationMsec)
-        print("Wait Time[sec]",self.waitTime)
         print("Make File Interval [sec]",self.fileInterval)
         print("Save Directory",self.savedir)
 
@@ -405,12 +391,14 @@ class Config_parameter:
                          ["Band Width[Hz]",self.bw],
                          ["Sampling Rate[Hz]",samplingRate],
                          ["Duration[msec]",self.durationMsec],
-                         ["Wait Time[sec]",self.waitTime],
                          ["Make File Interval [sec]",self.fileInterval]
                          ]
                         ,columns=['parameter', 'value']
                         )
         df.to_csv(os.path.join(self.savedir,filename))
+
+
+
 
 
 """

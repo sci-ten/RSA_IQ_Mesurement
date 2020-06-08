@@ -26,7 +26,7 @@ class Initial_Parameters:
         """
         self.spath=spath
 
-    def make_dic(self,cf,refLevel,bw,durationMsec,waitTime,fileInterval):
+    def make_dic(self,cf,refLevel,bw,durationMsec,fileInterval):
         """
         Paramaters
         -----------
@@ -46,10 +46,6 @@ class Initial_Parameters:
             Continuous observation time (cycle) Time to stream to one file
             [usec]
 
-        waitTime: float
-            Cycle to confirm the end of streaming of one file
-            [sec]
-
         fileInterval: float
             File make interval.Make each tiq files after wating for the value
             [sec]
@@ -64,7 +60,6 @@ class Initial_Parameters:
                  "Reference Level":refLevel,
                  "Band Width":bw,
                  "Duration":durationMsec,
-                 "Wait Time":waitTime,
                  "Make File Interval":fileInterval}
         return dic_par
 
@@ -90,7 +85,6 @@ class Initial_Parameters:
                  "Reference Level":-30,
                  "Band Width":1.25e6,
                  "Duration":1000,
-                 "Wait Time":1e-6,
                  "Make File Interval":0.0}
 
         return dic_par

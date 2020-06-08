@@ -6,8 +6,10 @@ Created on 2020/06/02
 import tkinter as tk
 from tkinter import filedialog
 import time
+
+
 from GUI import initial_parameter
-from Scheduller.Simple_Setting_Mode_Controll import *
+from Scheduller import main_controll
 
 
 #Header message
@@ -75,9 +77,7 @@ class FrameParameterInput(tk.Frame):
         # Forth Label
         self.input4=self.inputform_temp(text='Duration [msec]:',dicname="Duration",row=3,initvalue=1000)
         # Fifth Label
-        self.input5=self.inputform_temp(text='Wait time[sec]:',dicname="Wait Time",row=4,initvalue=0.0)
-        # Sixth Label
-        self.input6=self.inputform_temp(text='Make File Interval[sec]:',dicname="Make File Interval",row=4,initvalue=0.0)
+        self.input5=self.inputform_temp(text='Make File Interval[sec]:',dicname="Make File Interval",row=4,initvalue=0.0)
 
         self.input_frame.pack()
 
@@ -114,14 +114,13 @@ class FrameParameterInput(tk.Frame):
 
     #get mesurement parameter from window
     def get_parameter_from_window(self):
-
+        print('get')
         try:
             parameter={"cf":float(self.input1.get()),
                        "refLevel": float(self.input2.get()),
                        "bw": float(self.input3.get()),
                        "durationMsec": int(self.input4.get()),
-                       "waitTime" : float(self.input5.get()),
-                       "fileInterval" : float(self.input6.get()),
+                       "fileInterval" : float(self.input5.get()),
                        "savedir" : self.savedir_entry.get()
                        }
         except:
@@ -135,11 +134,11 @@ class RunBotton(tk.Frame):
         """
         master : object <class 'tkinter.Tk'>
 
-        nextpage: object <class 'tkinter.Tk'>
-            Transition destination page
-
         inputframe: object <class 'FrameParameterInput'>
             tkinter frame corresponds to the input form
+
+        APP: object <class 'tkinter.Tk'>
+            top level tkinter application
         """
         super().__init__(master)
         self.create_widget()
@@ -154,32 +153,25 @@ class RunBotton(tk.Frame):
 
     #Process when the execute button ON
     def run_button_clicked(self):
+        print("--Run Simple Setting Mode--")
         #Get value from input form to set mesurement parameter
         parameter=self.inputframe.get_parameter_from_window()
         print("run",parameter)
+        print(parameter)
         if parameter is None:
             self.failure_window()
             return
 
-        self.runner=SimpleSettingMode(parameter)
-        #Check parameter is not invalid
-        self.app_state=self.runner.RunCheck()
-        if not self.app_state:
-            self.failure_window()
-            return
-
         #Saved to use as initial parameter value at the next mesuremnt
-        self.inputframe.dic_par=self.inputframe.initpar.make_dic(cf=parameter['cf'],refLevel=parameter['refLevel'],bw=parameter['bw'],durationMsec=parameter['durationMsec'],waitTime=parameter['waitTime'],fileInterval=parameter['fileInterval'])
+        self.inputframe.dic_par=self.inputframe.initpar.make_dic(cf=parameter['cf'],refLevel=parameter['refLevel'],bw=parameter['bw'],durationMsec=parameter['durationMsec'],fileInterval=parameter['fileInterval'])
         self.inputframe.initpar.save_parameter(self.inputframe.dic_par)
 
-        print("観測開始")
-        time.sleep(0.1)
-        #Break GUI
-        self.App.destroy()
+        #Integrate mesurement parameters and execute
+        self.runner=main_controll.MesurementMainControll(mode='S',App=self.App,parameter=parameter)
 
-        #Run IQ Streaming
-        self.runner.Run()
-
+        app_state=self.runner.run()
+        if not app_state:
+            self.failure_window()
 
 
     def failure_window(self):
