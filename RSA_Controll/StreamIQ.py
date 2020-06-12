@@ -24,6 +24,7 @@ from RSA_Controll.RSA_API import *
 from RSA_Controll.time_adjust import *
 from RSA_Controll.Mesurement_log import *
 
+from File_Checker.filename_check import *
 
 
 # C:\Tektronix\RSA_API\lib\x64 needs to be added to the
@@ -40,17 +41,21 @@ class Control_RSA:
     rsa : object <class 'ctypes.CDLL'>
         RSA api object loaded with ctypes
     """
-    def __init__(self,rsa):
+    def __init__(self,rsa,timer):
         """
         Parameters
         ------------
         rsa: object <class 'ctypes.CDLL'>
             RSA api object loaded with ctypes
+        timer object <class 'TimeAdjust'> or <class 'TimeAdjustOffline'>
+            Time getter
         """
         #Create instance for parameter setting
         self.par=Config_parameter()
         #copy to reference rsa object
         self.rsa=rsa
+        #copy to time adjust objects
+        self.timer=timer
 
     #config IQ streaming parameter
     def config_iq_stream(self):
@@ -88,19 +93,15 @@ class Control_RSA:
         self.par.set_dest(IQSOUTDEST.IQSOD_FILE_TIQ)
         #setting measurement parameter to RSA
         self.config_iq_stream()
+        #Mesurement Progress Report object
+        self.prog=MesurementProgress(self.par.savedir)
         #save measuremant parameter
         self.par.export_parameter_csv_with_time()
-
-        #Time adjustment
-        timer=TimeAdjust()
-        if timer.standerd_time is None:
-            timer=TimeAdjustOffline()
-        timer.set_standerd_time()
 
         ##Run RSA device
         self.rsa.DEVICE_Run()
 
-        self.Streaming_loop_processing(timer)
+        self.Streaming_loop_processing()
 
         print('Streaming finished.')
         iqStreamInfo = IQSTREAM_File_Info()
@@ -108,7 +109,7 @@ class Control_RSA:
         Control_RSA.iqstream_status_parser(iqStreamInfo)
         self.rsa.DEVICE_Disconnect()
 
-    def Streaming_loop_processing(self,timer):
+    def Streaming_loop_processing(self):
         """
         Streaming processing loop part
         """
@@ -123,21 +124,23 @@ class Control_RSA:
             #Start IQstreaming
             self.rsa.IQSTREAM_Start()
 
-            #add mesuremnt log
-            prog=MesurementProgress(self.par.savedir)
-            nowUnixTime=timer.get_now_time_stamp()
-            tiqname=str(fileName)
-            prog.add_mesuremnt_log(nowUnixTime,tiqname)
+            #add mesuremnt progress
+            tiqname=get_latest_file(self.par.savedir,extension='tiq')
+            nowUnixTime=self.timer.get_now_time_stamp()
+            self.prog.add_mesuremnt_log(nowUnixTime,tiqname)
 
             #Case of complete.value==False,->continuous mesurement.
             while not complete.value:
                 #Monitor streaming progress.If time passes more than durationMsec,then complete=True.
                 self.rsa.IQSTREAM_GetDiskFileWriteStatus(byref(complete), byref(writing))
+
             #Stop IQstreaming
             self.rsa.IQSTREAM_Stop()
             time.sleep(self.par.fileInterval)
             num += 1
 
+            #iqStreamInfo=IQSTREAM_File_Info()
+            #self.rsa.IQSTREAM_GetDiskFileInfo(byref(iqStreamInfo))
 
 
     @staticmethod

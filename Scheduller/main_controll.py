@@ -10,6 +10,7 @@ from Scheduller import Simple_Setting_Mode_Controll
 from Scheduller import mesurement_schedule
 from DB_ULDL import db_RsaMesurementParameter
 from GUI import DB_sign_in
+from RSA_Controll import time_adjust
 
 class MesurementMainControll():
     def __init__(self,mode,App,parameter):
@@ -18,6 +19,13 @@ class MesurementMainControll():
         self.mode=mode
         self.db_dic=None
         self.parameter=parameter
+
+        #Time adjustment
+        self.timer=time_adjust.TimeAdjust()
+        if self.timer.standerd_time is None:
+            self.timer=time_adjust.TimeAdjustOffline()
+        self.timer.set_standerd_time()
+
 
     def run(self):
         #Processing case of schedule execution mode
@@ -29,7 +37,7 @@ class MesurementMainControll():
             #Create DataBase uploader object
             self.DB_uploader=db_RsaMesurementParameter.UpdateMesurementParms(self.condb.engine)
             #Create Mesurement Scheduller
-            sche=mesurement_schedule.SchedulemManager(self.parameter,self.App,self.DB_uploader)
+            sche=mesurement_schedule.SchedulemManager(self.parameter,self.App,self.DB_uploader,self.timer)
             #Exsecute Mesuement program according to schedule
             sche.controll_mesurement()
 
@@ -38,7 +46,7 @@ class MesurementMainControll():
         elif self.mode =='S':
             print("観測開始")
             time.sleep(0.1)
-            self.runner=Simple_Setting_Mode_Controll.SimpleSettingMode(self.parameter)
+            self.runner=Simple_Setting_Mode_Controll.SimpleSettingMode(self.parameter,self.timer)
 
             #Check parameter is not invalid
             self.app_state=self.runner.RunCheck()
@@ -53,17 +61,16 @@ class MesurementMainControll():
 
     def get_db_info(self):
         try:
-            self.db_dic=self.App.menubar_obj.bar_DB.sign_in_frame.dbinfo
+            self.db_dic=self.App.app.menubar_obj.bar_DB.sign_in_frame.dbinfo.dic
         except AttributeError:
-            #Open DB Sign in form
-            form=tk.Tk()
-            db=DB_sign_in.SingnInDatabaseForm(form)
-            db.mainloop()
-            if db.dbinfo.flag==True:
-                self.db_dic=db.dbinfo.dic
-            else:
-                return
 
+            self.App.app.menubar_obj.bar_DB.db_setting()
+            self.db_dic=self.App.app.menubar_obj.bar_DB.sign_in_frame.dbinfo.dic
+
+        print(self.db_dic)
+
+
+"""
 def main():
     root = tk.Tk()
     app = MesurementMainControll('A',root)
@@ -72,3 +79,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+"""

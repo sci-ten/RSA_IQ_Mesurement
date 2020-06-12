@@ -15,6 +15,7 @@ class Application(tk.Frame):
         super().__init__(master)
         self.master.geometry("500x420")
         self.master.title("Mesurement Setting")
+        self.master.app=self
         self.create_widget()
 
     def create_widget(self):

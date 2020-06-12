@@ -3,7 +3,7 @@ Created on 2020/06/06
 
 @author: HIROTO
 '''
-import ulid
+import ulid as ud
 
 
 class ExperimentID():
@@ -18,10 +18,8 @@ class ExperimentID():
         experiment id String
     """
     def __init__(self):
-        self.idobj= ulid.new()
+        self.idobj= ud.new()
         self.id=self.idobj.str
-
-
 
 
 

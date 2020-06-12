@@ -3,10 +3,13 @@ Created on 2020/06/05
 
 @author: HIROTO
 '''
+import time
 
 from RSA_Controll.StreamIQ import *
 from RSA_Controll.time_adjust import *
 from RSA_Controll.Mesurement_log import *
+
+from File_Checker.filename_check import *
 # C:\Tektronix\RSA_API\lib\x64 needs to be added to the
 # PATH system environment variable
 
@@ -36,15 +39,17 @@ class Control_RSA_ScheduleMesurement(Control_RSA):
         timer: object <class 'TimeAdjust'>
             Set the time correctly
         """
-        super().__init__(rsa)
+        super().__init__(rsa,timer)
         self.timer=timer
-        self.timedic={'StartTimeStamp':None,'StartUnixTime':None,'EndTimeStamp':None,'ENDUnixTime':None}
+        self.timedic={'StartTime':None,'StartUnixTime':None,'EndTime':None,'EndUnixTime':None}
         self.num=0
 
     def set_timer(self,timer):
         self.timer=timer
 
-    def iq_stream(self,id,schdule):
+    def iq_stream(self,id,schdule,progdir,app):
+        app.quit()
+        self.progdir=progdir
         """
         Run IQ Streaming according to schedule
         """
@@ -55,6 +60,9 @@ class Control_RSA_ScheduleMesurement(Control_RSA):
         self.par.set_dest(IQSOUTDEST.IQSOD_FILE_TIQ)
         #setting measurement parameter to RSA
         self.config_iq_stream()
+
+        #Mesurement Progress Report object
+        self.prog=MesurementProgress(self.progdir)
 
         #save measuremant parameter
         #self.par.export_parameter_csv_with_time()
@@ -67,13 +75,15 @@ class Control_RSA_ScheduleMesurement(Control_RSA):
 
         #get_now_time_stamp
         self.timedic['StartUnixTime']=self.timer.get_now_time_stamp()
-        self.timedic['StartTimeStamp']=convert_string_timestamp(self.timedic['StartUnixTime'])
+        starttime=convert_datetime(self.timedic['StartUnixTime'])
+        self.timedic['StartTime']=convert_string_timestamp(starttime)
 
         #IQ streaming Loop part
         self.Streaming_loop_processing()
 
-        self.timedic['ENDUnixTime']=self.timer.get_now_time_stamp()
-        self.timedic['EndTimeStamp']=convert_string_timestamp(self.timedic['ENDUnixTime'])
+        self.timedic['EndUnixTime']=self.timer.get_now_time_stamp()
+        endtime=convert_datetime(self.timedic['EndUnixTime'])
+        self.timedic['EndTime']=convert_string_timestamp(endtime)
 
     def Streaming_loop_processing(self):
         self.num=0
@@ -87,25 +97,29 @@ class Control_RSA_ScheduleMesurement(Control_RSA):
             #Start IQstreaming
             self.rsa.IQSTREAM_Start()
 
-            #add mesuremnt log
-            prog=MesurementProgress(self.par.savedir)
+            tiqname=get_latest_file(self.par.savedir,extension='tiq')
             nowUnixTime=self.timer.get_now_time_stamp()
-            tiqname=str(fileName)
-            prog.add_mesuremnt_log(nowUnixTime,tiqname)
+            self.prog.add_mesuremnt_log(nowUnixTime,tiqname,self.id)
 
+            flag=True
             #Case of complete.value==False,->continuous mesurement.
             while not complete.value:
                 #Monitor streaming progress.If time passes more than durationMsec,then complete=True.
                 self.rsa.IQSTREAM_GetDiskFileWriteStatus(byref(complete), byref(writing))
-
+                """
+                if flag==True:
+                    #add mesuremnt progress
+                    tiqname=get_latest_file(self.par.savedir,extension='tiq')
+                    flag=False
+                """
             #Stop IQstreaming
             self.rsa.IQSTREAM_Stop()
             time.sleep(self.par.fileInterval)
             self.num += 1
 
             #END
-            time=self.timer.get_now_time_stamp()
-            if time >=self.schdule['ENDUnixTime']:
+            nowtimestamp=self.timer.get_now_time_stamp()
+            if nowtimestamp>=self.schdule['ENDUnixTime']:
                 break
 
         return self.num

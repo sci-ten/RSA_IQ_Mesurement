@@ -209,8 +209,6 @@ class RunBotton(tk.Frame):
         self.runner=main_controll.MesurementMainControll(mode='A',App=self.App,parameter=parameter)
         self.runner.run()
 
-        #Finished
-        self.App.destroy()
 
     def failure_window(self):
         failwin=tk.Tk()

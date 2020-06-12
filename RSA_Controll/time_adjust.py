@@ -17,6 +17,9 @@ import socket
 
 class TimeAdjust():
     def __init__(self):
+        """
+        Time standard used to control mesurement processing
+        """
         self.call_time=None
         self.recived_time=None
         self.standerd_time=self.set_standerd_time()
@@ -32,6 +35,7 @@ class TimeAdjust():
                 body =  json.load(res)
                 self.recived_time= time.perf_counter()
                 self.standerd_time=body["st"]+(self.recived_time-self.call_time)/2
+                print("Online Timeadjust ",self.standerd_time,convert_datetime(self.standerd_time))
                 print("roundtrip",self.recived_time-self.call_time)
         except:
             print('NTP server time out')
@@ -47,6 +51,7 @@ class TimeAdjust():
 class TimeAdjustOffline(TimeAdjust):
     def __init__(self):
         self.standerdtime=self.set_standerd_time()
+        print("OFFline Timeadjust",self.standerdtime,convert_datetime(self.standerdtime))
 
     def set_standerd_time(self):
         self.standerdtime=time.time()
@@ -69,3 +74,11 @@ def convert_string_timestamp_to_milli(dateobj):
 def convert_string_timestamp(dateobj):
     str_time=dateobj.strftime("%Y-%m-%d %H:%M:%S")
     return str_time
+
+
+"""
+x= TimeAdjust()
+y=x.get_now_time_stamp()
+print(y,type(y))
+print(convert_datetime(y))
+"""

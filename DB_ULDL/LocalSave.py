@@ -17,6 +17,6 @@ class LocalBackUp():
         self.savedir=savedir
 
     def save(self,df):
-        df.to_csv(self.savedir)
+        df.to_csv(self.savedir+'//log.csv')
 
 

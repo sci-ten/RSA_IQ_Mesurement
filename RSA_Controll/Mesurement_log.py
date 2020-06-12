@@ -10,20 +10,40 @@ import os
 from RSA_Controll import time_adjust
 
 class MesurementProgress():
+    """
+    Save the mesurement start time for each tiq file
+
+    Attributes
+    -------------
+    savedir : string
+        save directory
+    savepath:
+        save file path
+    """
     def __init__(self,savedir,filename=r"mesurement_progress.csv"):
+
         self.savedir=savedir
         self.savepath=os.path.join(self.savedir,filename)
 
+    def add_mesuremnt_log(self,nowUnixTime,tiqname,id=None):
+        """
+        Overwrite save mesurement progress
 
-
-    def add_mesuremnt_log(self,nowUnixTime,tiqname):
+        Parameters
+        -------------
+        nowUnixTime : float
+            TimeStamp when the target tiq file was created
+        tiqname : String
+            Name of target tiq file
+        """
         #convert now standard time stamp from unixtime
         nowTime=time_adjust.convert_datetime(nowUnixTime)
-        time_str=time_adjust.convert_string_timestamp_to_milli(nowTime)
+        time_str=time_adjust.convert_string_timestamp(nowTime)
 
-        Headers=["TimeStamp[sec]","UnixTime[sec]","TIQfilename"]
-        contents={"TimeStamp[sec]":time_str,"UnixTime[sec]":nowUnixTime,"TIQfilename":tiqname}
-
+        #csv header
+        Headers=["TimeStamp[sec]","UnixTime[sec]","TIQfilename","id"]
+        #contents to add to csv
+        contents={"TimeStamp[sec]":time_str,"UnixTime[sec]":nowUnixTime,"TIQfilename":tiqname,"id":id}
 
         #If the file does not exist, make file and add a header
         if not os.path.exists(self.savepath):

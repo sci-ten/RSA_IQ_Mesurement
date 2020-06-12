@@ -67,6 +67,7 @@ class ConnectDB():
 
         #connect my sql, Returns True if successful
         self.result=self.connect_mysql()
+        print("Database connection -> True")
 
 
     def connect_mysql(self):
@@ -87,7 +88,7 @@ class ConnectDB():
         self.cur.execute(query)
 
     def make_url(self):
-        self.url='mysql+pymysql://%s:%s@%s/%s?charset=utf8' %(self.user,self.__password,self.host,self.dbName)
+        self.url='mysql+pymysql://%s:%s@%s/%s?charset=utf8' %(self.user,self.password,self.host,self.dbName)
         return self.url
 
 

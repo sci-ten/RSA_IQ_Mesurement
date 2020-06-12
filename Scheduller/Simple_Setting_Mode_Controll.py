@@ -23,7 +23,7 @@ class SimpleSettingMode():
     app_state : bool
         Whether the parameters are set correctly.
     """
-    def __init__(self,parameter):
+    def __init__(self,parameter,timer):
         """
         parameter: dictionary
             mesurement parameter
@@ -31,7 +31,7 @@ class SimpleSettingMode():
         os.chdir("C:\\Tektronix\\RSA_API\\lib\\x64")
         rsa = cdll.LoadLibrary("RSA_API.dll")
 
-        self.mang_rsa=Control_RSA(rsa=rsa)
+        self.mang_rsa=Control_RSA(rsa=rsa,timer=timer)
         self.conf=self.mang_rsa.par
         self.app_state=False
 
