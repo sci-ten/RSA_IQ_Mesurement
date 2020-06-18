@@ -44,8 +44,7 @@ class MesurementMainControll():
 
         #Processing case of Simple setting mode
         elif self.mode =='S':
-            print("観測開始")
-            time.sleep(0.1)
+            #runner object
             self.runner=Simple_Setting_Mode_Controll.SimpleSettingMode(self.parameter,self.timer)
 
             #Check parameter is not invalid
@@ -68,15 +67,3 @@ class MesurementMainControll():
             self.db_dic=self.App.app.menubar_obj.bar_DB.sign_in_frame.dbinfo.dic
 
         print(self.db_dic)
-
-
-"""
-def main():
-    root = tk.Tk()
-    app = MesurementMainControll('A',root)
-
-
-
-if __name__ == '__main__':
-    main()
-"""

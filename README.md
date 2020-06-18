@@ -1,2 +1,5 @@
 # RSA_IQ_Mesurement
- Spectrum mesurement system using RSA API of tektronix. It executes mesurement according to the time schedule and uploads logs to the database. 
+
+RSA(Real Time Spectrum Analayer)を用いた無線周波数観測システム.
+ハードウェア制御はtektronix社のRSA APIを利用する.
+このリポジトリでは,RSA APIを使ったハードウェア制御に加えて, ntp時刻同期 ,スケジューラを使った観測管理, データベースへのアップロード機能を実装する.

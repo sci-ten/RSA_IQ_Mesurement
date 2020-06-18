@@ -54,12 +54,3 @@ class MesurementProgress():
         with open(self.savepath,'a', newline="") as f:
             writer = csv.DictWriter(f, fieldnames=Headers)
             writer.writerow(contents)
-
-
-"""
-savedir=r"D:\test"
-m=MesurementProgress(savedir)
-x=time_adjust.TimeAdjust()
-nowUnixTime=x.get_now_time_stamp()
-m.add_mesuremnt_log(nowUnixTime, "1")
-"""

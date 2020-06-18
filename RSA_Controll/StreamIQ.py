@@ -399,25 +399,3 @@ class Config_parameter:
                         ,columns=['parameter', 'value']
                         )
         df.to_csv(os.path.join(self.savedir,filename))
-
-
-
-
-
-"""
-
-def main():
-    #set the RSA API path
-    os.chdir("C:\\Tektronix\\RSA_API\\lib\\x64")
-    rsa = cdll.LoadLibrary("RSA_API.dll")
-    #control RSA
-    mang_rsa=Control_RSA(rsa)
-    #GUI
-    win = tk.Tk()
-    app = GuiApp.GUI_App(master=win,mang_rsa=mang_rsa)
-    #run gui application
-    app.mainloop()
-
-if __name__ == '__main__':
-    main()
-"""

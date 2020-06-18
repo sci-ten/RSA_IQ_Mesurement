@@ -189,8 +189,9 @@ class RunBotton(tk.Frame):
 
     def run_button_clicked(self):
         print("--Run Schedule Mode--")
-        print(self.schepath_entry.get())
-        print(self.savedir_entry.get())
+        print("\nschdule path -> ",self.schepath_entry.get())
+        print("tiq save directory -> ",self.savedir_entry.get())
+        
         #Get value from input form to set mesurement parameter
         schepath=self.schepath_entry.get()
         savedir=self.savedir_entry.get()

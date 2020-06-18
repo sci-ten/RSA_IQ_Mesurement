@@ -33,10 +33,38 @@ class SchedulemManager():
         csv which describes the mesurement schedule
     savedir: string
         directory to save TIQ file
+    progdir: string
+        directory to save mesurement progress data
     App: object <class'tkinter.Tk>
         top level gui object
+    DB_uploader: object <class 'UpdateMesurementParms'>
+        DataBase uploader object
+    schdule: object <class 'ScheduleParser'>
+        Object to read the schedule to be executed in a fixed form
+    timer: object <class 'TimeAdjust'>
+        Object to get the current time
+    rsa_prams_table: object <class 'MesurementParmsTable'>
+        Object to hold information to white data in database
+    loc_bk: object <class 'LocalBackUp'>
+        Backup the contents written to the database locally
+    rsa: cdll.LoadLibrary("RSA_API.dll")
+        An object for using the RSA API written in programing C
+    mang_rsa: object <class 'Control_RSA_ScheduleMesurement'>
+        Objects that operate RSA
     """
     def __init__(self,parameter,App,DB_uploader,timer):
+        """
+        parameters
+        --------------
+        parameter: dictionary
+            File path is stored dictionary
+        App: object <class 'tkinter.TK'>
+            GUI Window object
+        DB_uploader: <class 'UpdateMesurementParms'>
+            DataBase uploader object
+        timer: object <class 'TimeAdjust'>
+            Object to get the current time
+        """
         self.schepath=parameter["schepath"]
         self.savedir=parameter["savedir"]
         self.progdir=parameter["progdir"]
@@ -93,12 +121,11 @@ class SchedulemManager():
                 savedir=self.savedir+"//id-"+str(idobj.id)
                 os.makedirs(savedir, exist_ok=True)
 
-
                 #set mesurement parameter
                 self.mang_rsa.par.set_parameter(cf=df_para.at['Center Freqency[Hz]', 'value'],refLevel=df_para.at['Reference Level[dBm]', 'value'],bw=df_para.at['Band Width[Hz]', 'value'],durationMsec=df_para.at['Duration[msec]', 'value'],fileInterval=df_para.at['Make File Interval [sec]','value'],savedir=savedir)
 
                 #Wait for scheduled time and run
-                s.enterabs(row['StartUnixTime'],1, self.mang_rsa.iq_stream, argument=(idobj.id,row,self.progdir,self.App))
+                s.enterabs(row['StartUnixTime'],1, self.mang_rsa.iq_stream, argument=(idobj.id,row))
                 print("\nNow Waiting Schdule :\n",row)
                 s.run()
 
@@ -115,20 +142,45 @@ class SchedulemManager():
 
                 self.loc_bk.save(self.rsa_prams_table.ms_parms_df)
 
-    def schedule_run(self,id,row,progdir,App=None):
-        try:
-            App.destroy()
-        except:
-            pass
+    def schedule_run(self,id,schdule):
+        """
+        Called by the scheduler at the specified time.
+        It calls the RSA mesurement method
 
-        self.mang_rsa.iq_stream(id,row,progdir)
+        parameters
+        -------------
+        id: string
+            Unique ID to identify each experiment
+        schdule: pandas Series
+            Information of schdule to be executed
+        """
+        self.mang_rsa.iq_stream(id,schdule)
 
 
 
 
 
 class ScheduleParser():
+    """
+    Read the mesurement schedule and parse
+
+    Attributes
+    -------------
+    data_format: object <class 'DateFormat'>
+        Date format
+    time_format
+        Time format
+    load_data_df: pandas DataFrame
+        Mesurement schdule
+    complite: bool
+        All read schdule valid
+    """
     def __init__(self,path):
+        """
+        Parameters
+        --------------
+        The path where the csv file that describes the mesurement schedule
+        """
         self.date_format=DateFormat()
         self.time_format=TimeFormat()
         self.load_data_df=self.laod_schedule(path)
@@ -220,7 +272,3 @@ class TimeFormat():
         #eg. 12:05:10
         self.digit_num_list=[2,2,2]
         self.partition=[' ',':',':','']
-
-
-
-

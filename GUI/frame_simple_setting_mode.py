@@ -106,7 +106,7 @@ class FrameParameterInput(tk.Frame):
         sp = tk.Tk()
         sp.withdraw()
         sp.filename =  filedialog.askdirectory(initialdir = "/",title = "Select Directory")
-        print (sp.filename)
+
         self.savepath=sp.filename
         self.savedir_entry.delete(0, tk.END)
         self.savedir_entry.insert(tk.END,sp.filename)
@@ -114,7 +114,6 @@ class FrameParameterInput(tk.Frame):
 
     #get mesurement parameter from window
     def get_parameter_from_window(self):
-        print('get')
         try:
             parameter={"cf":float(self.input1.get()),
                        "refLevel": float(self.input2.get()),
@@ -124,7 +123,7 @@ class FrameParameterInput(tk.Frame):
                        "savedir" : self.savedir_entry.get()
                        }
         except:
-            print("cannottype change input data")
+            print("\n cannot type change input data")
             parameter=None
         return parameter
 
@@ -156,8 +155,8 @@ class RunBotton(tk.Frame):
         print("--Run Simple Setting Mode--")
         #Get value from input form to set mesurement parameter
         parameter=self.inputframe.get_parameter_from_window()
-        print("run",parameter)
-        print(parameter)
+        print("\n->")
+        print(" ",parameter)
         if parameter is None:
             self.failure_window()
             return
@@ -184,5 +183,3 @@ class RunBotton(tk.Frame):
             )
 
         label1.pack()
-
-

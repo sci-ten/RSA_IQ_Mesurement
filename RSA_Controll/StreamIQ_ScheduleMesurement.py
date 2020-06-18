@@ -106,12 +106,7 @@ class Control_RSA_ScheduleMesurement(Control_RSA):
             while not complete.value:
                 #Monitor streaming progress.If time passes more than durationMsec,then complete=True.
                 self.rsa.IQSTREAM_GetDiskFileWriteStatus(byref(complete), byref(writing))
-                """
-                if flag==True:
-                    #add mesuremnt progress
-                    tiqname=get_latest_file(self.par.savedir,extension='tiq')
-                    flag=False
-                """
+                
             #Stop IQstreaming
             self.rsa.IQSTREAM_Stop()
             time.sleep(self.par.fileInterval)
@@ -123,12 +118,3 @@ class Control_RSA_ScheduleMesurement(Control_RSA):
                 break
 
         return self.num
-
-
-
-
-
-
-
-
-
