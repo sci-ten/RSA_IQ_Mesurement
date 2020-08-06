@@ -26,9 +26,7 @@ class SimpleSettingMode():
     def __init__(self,parameter,timer):
         """
         parameter: dictionary
-            Mesurement parameter
-        timer : object <class 'TimeAdjust'>
-            Object to get the current time
+            mesurement parameter
         """
         os.chdir("C:\\Tektronix\\RSA_API\\lib\\x64")
         rsa = cdll.LoadLibrary("RSA_API.dll")
@@ -42,7 +40,6 @@ class SimpleSettingMode():
 
     def Run(self):
         if self.app_state==True:
-            #print console
             self.conf.print_prameter()
             #Start IQ Streaming
             self.mang_rsa.iq_stream()
