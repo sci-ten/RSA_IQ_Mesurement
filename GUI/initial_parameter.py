@@ -13,8 +13,8 @@ class Initial_Parameters:
     """
     def __init__(self):
         #default last mesurement parameter save path
-        self.spath=r"C:\pleiades\workspace\RSA_IQ_STREAMING\last_parameters.pickle"
-
+        #self.spath=r"C:\pleiades\workspace\RSA_IQ_STREAMING\last_parameters.pickle"
+        self.spath=r"./Last_Parameter_File\last_parameters.pickle"
     def set_savepath(self,spath):
         """
         set a save path for last mesurement parameters

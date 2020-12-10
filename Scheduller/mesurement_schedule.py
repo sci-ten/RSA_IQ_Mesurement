@@ -11,7 +11,7 @@ import sched
 import time
 import os
 from ctypes import *
-
+import sys
 
 from DB_ULDL import db_RsaMesurementParameter
 from DB_ULDL import experiment_id
@@ -58,7 +58,7 @@ class SchedulemManager():
         self.loc_bk=LocalSave.LocalBackUp(self.savedir)
 
         #set the RSA API path
-        os.chdir("C:\\Tektronix\\RSA_API\\lib\\x64")
+        sys.path.append("C:\\Tektronix\\RSA_API\\lib\\x64")
 
         #Load RSA API
         self.rsa=cdll.LoadLibrary("RSA_API.dll")

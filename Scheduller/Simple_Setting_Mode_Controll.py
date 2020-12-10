@@ -5,6 +5,7 @@ Created on 2020/06/05
 '''
 
 import os
+import sys
 import tkinter as tk
 from ctypes import *
 
@@ -28,7 +29,8 @@ class SimpleSettingMode():
         parameter: dictionary
             mesurement parameter
         """
-        os.chdir("C:\\Tektronix\\RSA_API\\lib\\x64")
+        #os.chdir("C:\\Tektronix\\RSA_API\\lib\\x64")
+        sys.path.append(r"C:\\Tektronix\\RSA_API\\lib\\x64")
         rsa = cdll.LoadLibrary("RSA_API.dll")
 
         self.mang_rsa=Control_RSA(rsa=rsa,timer=timer)
